@@ -1,0 +1,31 @@
+# Visual Studio Code'e özel dosyalar
+.vscode/
+
+# .NET tarafından oluşturulan dosyalar ve klasörler
+bin/
+obj/
+obj-*/
+
+# dotnet SDK tarafından oluşturulan klasör
+bin/
+obj/
+
+# Build sonuçlarını içeren dosyalar
+*.dll
+*.exe
+*.pdb
+*.dll.config
+
+# Visual Studio tarafından oluşturulan klasörler
+.vs/
+bin/
+obj/
+
+# Paketler ve NuGet klasörü
+**/packages/*
+!.nuget/
+*.nupkg
+*.paket
+*.bak
+*.cache
+*.csproj.user

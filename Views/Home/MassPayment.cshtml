@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mass Payment Form</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .response-container {
+            margin-top: 20px;
+        }
+
+        .response-item.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .response-item.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <form id="massPaymentForm">
+            <div class="form-group">
+                <label style="margin-bottom: 10px;">Payout Options:</label><br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="accountNumberOption" name="paymentOption"
+                        value="AccountNumber" checked>
+                    <label class="form-check-label" for="accountNumberOption">AccountNumber</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="tcknOption" name="paymentOption" value="Tckn">
+                    <label class="form-check-label" for="tcknOption">Tckn</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="phoneOption" name="paymentOption" value="Phone">
+                    <label class="form-check-label" for="phoneOption">Phone</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="emailOption" name="paymentOption" value="Email">
+                    <label class="form-check-label" for="emailOption">Email</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="MassPaymentId">MassPaymentId:</label>
+                <input type="text" class="form-control" id="MassPaymentId" name="MassPaymentId" value="">
+            </div>
+
+            <div class="form-group">
+                <label for="Amount">Amount:</label>
+                <input type="number" class="form-control" id="Amount" name="Amount">
+            </div>
+
+            <div class="form-group">
+                <label for="Description">Description:</label>
+                <input type="text" class="form-control" id="Description" name="description">
+            </div>
+
+            <div id="accountNumberFields" class="form-group">
+                <label for="AccountNumber">AccountNumber:</label>
+                <input type="text" class="form-control" id="AccountNumber" name="accountNumber">
+            </div>
+
+            <div id="tcknFields" class="form-group hidden">
+                <label for="Tckn">Tckn:</label>
+                <input type="text" class="form-control" id="Tckn" name="tckn">
+            </div>
+
+            <div id="phoneFields" class="form-group hidden">
+                <label for="PhoneNumber">PhoneNumber:</label>
+                <input type="text" class="form-control" id="PhoneNumber" name="phoneNumber">
+                <div class="custom-control custom-switch" style="margin-top: 10px;">
+                    <input type="checkbox" class="custom-control-input" id="SendInvitation" name="sendInvitation">
+                    <label class="custom-control-label" for="SendInvitation">Send Invitation</label>
+                </div>
+            </div>
+
+
+            <div id="emailFields" class="form-group hidden">
+                <label for="Email">Email:</label>
+                <input type="text" class="form-control" id="Email" name="email">
+            </div>
+
+            <button type="button" class="btn btn-dark" onclick="fillMassPaymentId()">Generate MassPaymentId</button>
+            <button type="button" class="btn btn-primary" onclick="submitForm()">Submit Payment</button>
+            <button type="button" class="btn btn-success" onclick="validateMassPayment()">Validate MassPayment</button>
+            <button type="button" class="btn btn-info" onclick="GetMassPayment()">Get MassPayment</button>
+
+
+
+        </form>
+
+        <div id="response" class="response-container"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function fillMassPaymentId() {
+            document.getElementById('MassPaymentId').value = generateRandomNumber();
+        }
+
+        function generateRandomNumber() {
+            const random = Math.floor(1000000 + Math.random() * 9000000);
+            return 'EBYM' + random;
+        }
+
+        document.querySelectorAll('input[name="paymentOption"]').forEach(option => {
+            option.addEventListener('change', function () {
+                document.getElementById('accountNumberFields').classList.add('hidden');
+                document.getElementById('tcknFields').classList.add('hidden');
+                document.getElementById('phoneFields').classList.add('hidden');
+                document.getElementById('emailFields').classList.add('hidden');
+
+                if (this.value === 'AccountNumber') {
+                    document.getElementById('accountNumberFields').classList.remove('hidden');
+                } else if (this.value === 'Tckn') {
+                    document.getElementById('tcknFields').classList.remove('hidden');
+                } else if (this.value === 'Phone') {
+                    document.getElementById('phoneFields').classList.remove('hidden');
+                } else if (this.value === 'Email') {
+                    document.getElementById('emailFields').classList.remove('hidden');
+                }
+            });
+        });
+
+        async function submitForm() {
+            const selectedOption = document.querySelector('input[name="paymentOption"]:checked').value;
+            const endpoint = `/MassPayment/${selectedOption}`;
+
+            const formData = {
+                MassPaymentId: String(document.getElementById('MassPaymentId').value),
+                Amount: parseFloat(document.getElementById('Amount').value),
+                Description: String(document.getElementById('Description').value)
+            };
+
+            if (selectedOption === 'AccountNumber') {
+                formData.AccountNumber = String(document.getElementById('AccountNumber').value);
+            } else if (selectedOption === 'Tckn') {
+                formData.TurkishNationalId = Number(document.getElementById('Tckn').value);
+            } else if (selectedOption === 'Phone') {
+                formData.PhoneNumber = String(document.getElementById('PhoneNumber').value);
+                formData.SendInvitation = document.getElementById('SendInvitation').checked;
+            } else if (selectedOption === 'Email') {
+                formData.Email = String(document.getElementById('Email').value);
+            }
+
+            console.log(formData);
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                const responseDiv = document.getElementById('response');
+
+                responseDiv.innerHTML = '';
+
+                if (data.succeeded) {
+                    const responseData = data.data;
+                    for (const [key, value] of Object.entries(responseData)) {
+                        const p = document.createElement('p');
+                        p.className = 'response-item success';
+                        p.textContent = `${key}: ${value}`;
+                        responseDiv.appendChild(p);
+                    }
+                } else {
+                    const p = document.createElement('p');
+                    p.className = 'response-item error';
+                    p.textContent = data.error.message;
+                    responseDiv.appendChild(p);
+                }
+            } catch (error) {
+                const responseDiv = document.getElementById('response');
+                responseDiv.innerHTML = '';
+                const p = document.createElement('p');
+                p.className = 'response-item error';
+                p.textContent = 'An error occurred';
+                responseDiv.appendChild(p);
+            }
+        }
+
+        async function validateMassPayment() {
+            const selectedOption = document.querySelector('input[name="paymentOption"]:checked').value;
+            const endpoint = `/MassPayment/Validate/${selectedOption}`;
+
+            const formData = {
+                MassPaymentId: String(document.getElementById('MassPaymentId').value),
+                Amount: parseFloat(document.getElementById('Amount').value),
+                Description: String(document.getElementById('Description').value)
+            };
+
+            if (selectedOption === 'AccountNumber') {
+                formData.AccountNumber = String(document.getElementById('AccountNumber').value);
+            } else if (selectedOption === 'Tckn') {
+                formData.TurkishNationalId = Number(document.getElementById('Tckn').value);
+            } else if (selectedOption === 'Phone') {
+                formData.PhoneNumber = String(document.getElementById('PhoneNumber').value);
+                formData.SendInvitation = document.getElementById('SendInvitation').checked;
+            } else if (selectedOption === 'Email') {
+                formData.Email = String(document.getElementById('Email').value);
+            }
+
+            console.log(formData);
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                const responseDiv = document.getElementById('response');
+
+                responseDiv.innerHTML = '';
+
+                if (data.succeeded) {
+                    const successMessage = document.createElement('p');
+                    successMessage.className = 'response-item success';
+                    successMessage.textContent = 'Ödeme Dağıtım Validasyonu Başarılı!';
+                    responseDiv.appendChild(successMessage);
+                } else {
+                    const p = document.createElement('p');
+                    p.className = 'response-item error';
+                    p.textContent = data.error.message;
+                    responseDiv.appendChild(p);
+                }
+            } catch (error) {
+                const responseDiv = document.getElementById('response');
+                responseDiv.innerHTML = '';
+                const p = document.createElement('p');
+                p.className = 'response-item error';
+                p.textContent = 'Bir hata oluştu';
+                responseDiv.appendChild(p);
+            }
+        }
+
+        async function GetMassPayment() {
+            const referenceId = document.getElementById('MassPaymentId').value;
+            const endpoint = `/MassPayment/Detail?referenceId=${referenceId}`;
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                const responseDiv = document.getElementById('response');
+
+                responseDiv.innerHTML = '';
+
+                if (data.succeeded) {
+                    const successMessage = document.createElement('p');
+                    successMessage.className = 'response-item success';
+                    successMessage.textContent = 'Ödeme Dağıtım İşlemi Başarılı!';
+                    responseDiv.appendChild(successMessage);
+
+                    const responseData = data.data;
+                    for (const [key, value] of Object.entries(responseData)) {
+                        const p = document.createElement('p');
+                        p.className = 'response-item success';
+                        p.textContent = `${key}: ${value}`;
+                        responseDiv.appendChild(p);
+                    }
+                } else {
+                    const p = document.createElement('p');
+                    p.className = 'response-item error';
+                    p.textContent = data.error.message;
+                    responseDiv.appendChild(p);
+                }
+            } catch (error) {
+                const responseDiv = document.getElementById('response');
+                responseDiv.innerHTML = '';
+                const p = document.createElement('p');
+                p.className = 'response-item error';
+                p.textContent = 'Bir hata oluştu';
+                responseDiv.appendChild(p);
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>
+

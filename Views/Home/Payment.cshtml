@@ -1,0 +1,185 @@
+@using PaparaIntegration.Models.Response.Payment
+@model PaymentResponseModel
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Form</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .response-container {
+            margin-top: 20px;
+        }
+
+        .response-item.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .response-item.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <form id="paymentForm">
+            <div class="form-group">
+                <label for="Amount">Amount:</label>
+                <input type="number" class="form-control" id="Amount" name="Amount">
+            </div>
+            <div class="form-group">
+                <label for="ReferenceId">Reference ID:</label>
+                <input type="text" class="form-control" id="ReferenceId" name="ReferenceId">
+            </div>
+            <div class="form-group">
+                <label for="OrderDescription">Order Description:</label>
+                <input type="text" class="form-control" id="OrderDescription" name="OrderDescription">
+            </div>
+            <div class="form-group">
+                <label for="NotificationUrl">Notification URL:</label>
+                <input type="text" class="form-control" id="NotificationUrl" name="NotificationUrl">
+            </div>
+            <div class="form-group">
+                <label for="FailNotificationUrl">Fail Notification URL:</label>
+                <input type="text" class="form-control" id="FailNotificationUrl" name="FailNotificationUrl">
+            </div>
+            <div class="form-group">
+                <label for="RedirectUrl">Redirect URL:</label>
+                <input type="text" class="form-control" id="RedirectUrl" name="RedirectUrl">
+            </div>
+            <button type="button" class="btn btn-dark" onclick="fillReferenceId()">Generate ReferenceId</button>
+            <button type="button" class="btn btn-primary" onclick="submitForm()">Create Payment</button>
+            <button type="button" class="btn btn-secondary" onclick="GetPayment()">Get Payment</button>
+
+
+        </form>
+        <div id="response" class="response-container"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function fillReferenceId() {
+            document.getElementById('ReferenceId').value = generateRandomNumber();
+        }
+
+        function generateRandomNumber() {
+            const random = Math.floor(1000000 + Math.random() * 9000000);
+            return 'EBYP' + random;
+        }
+
+        async function submitForm() {
+            const formData = {
+                Amount: parseFloat(document.getElementById('Amount').value),
+                ReferenceId: String(document.getElementById('ReferenceId').value),
+                OrderDescription: String(document.getElementById('OrderDescription').value),
+                NotificationUrl: String(document.getElementById('NotificationUrl').value),
+                FailNotificationUrl: String(document.getElementById('FailNotificationUrl').value),
+                RedirectUrl: String(document.getElementById('RedirectUrl').value)
+            };
+
+            try {
+                const response = await fetch('/Payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                handleResponse(data, true); // true parametresi yeni sekme açılmasını sağlar
+            } catch (error) {
+                handleError();
+            }
+        }
+
+        async function GetPayment() {
+            const referenceId = document.getElementById('ReferenceId').value;
+            const endpoint = `/Payment/Inquiry?referenceId=${referenceId}`;
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                handleResponse(data);
+            } catch (error) {
+                handleError();
+            }
+        }
+
+        function handleResponse(data, openNewTab = false) {
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = '';
+
+            if (data.succeeded) {
+                const responseData = data.data;
+                for (const [key, value] of Object.entries(responseData)) {
+                    const p = document.createElement('p');
+                    p.className = 'response-item success';
+                    p.textContent = `${key}: ${value}`;
+                    responseDiv.appendChild(p);
+                }
+
+                if (openNewTab) {
+                    const confirmOpenNewTab = confirm('Ödeme sayfasını yeni sekmede açmak istiyor musunuz?');
+                    if (confirmOpenNewTab) {
+                        window.open(responseData.paymentUrl, '_blank');
+                    }
+                }
+            } else {
+                const p = document.createElement('p');
+                p.className = 'response-item error';
+                p.textContent = data.error.message;
+                responseDiv.appendChild(p);
+            }
+        }
+
+        function handleError() {
+            const responseDiv = document.getElementById('response');
+            responseDiv.innerHTML = '';
+            const p = document.createElement('p');
+            p.className = 'response-item error';
+            p.textContent = 'An error occurred';
+            responseDiv.appendChild(p);
+        }
+    </script>
+
+</body>
+
+</html>
