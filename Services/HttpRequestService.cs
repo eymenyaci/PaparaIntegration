@@ -9,7 +9,7 @@ namespace PaparaIntegration.Services
 {
     public class HttpRequestService : IHttpRequestService
     {
-        private const string ApiKey = "sYxI84PYeKPHeXQSE8+c1bmlzgyfaeQ8zErKnSJI1PsxCn9vPUSGmH31wb9N0Wfi502AD0/ie5ksEsam8a9K6g==";
+        private const string ApiKey = "KeMEAJyuUmzRQEdeuxDyz4CRawY3GSJrKvhGzlP+RoSJgSCqOFRsTATW0+t2IhrWArxW0PqAkxDf******";
         private readonly HttpClient _httpClient;
 
         public HttpRequestService(HttpClient httpClient)

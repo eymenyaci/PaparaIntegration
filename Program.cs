@@ -13,6 +13,8 @@ builder.Services.AddScoped<IMassPaymentService, MassPaymentService>();
 builder.Services.AddScoped<IHttpRequestService,HttpRequestService>();
 builder.Services.AddScoped<IPaymentService,PaymentService>();
 builder.Services.AddScoped<IAccountService,AccountService>();
+builder.Services.AddScoped<ICorporateCardService,CorporateCardService>();
+
 
 
 var app = builder.Build();
