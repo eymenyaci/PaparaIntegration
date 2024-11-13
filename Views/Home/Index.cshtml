@@ -76,8 +76,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (Model.PaymentLedgers.data != null && Model.PaymentLedgers.data.items != null &&
-                                Model.PaymentLedgers.data.items.Any())
+                                @if (Model?.PaymentLedgers?.data?.items != null && Model.PaymentLedgers.data.items.Any())
                                 {
                                     @foreach (var item in Model.PaymentLedgers.data.items)
                                     {
@@ -155,8 +154,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (Model.PayoutLedgers.data != null && Model.PayoutLedgers.data.items != null &&
-                                Model.PayoutLedgers.data.items.Any(x => x.entryType == 9))
+                                @if (Model?.PayoutLedgers?.data?.items != null && Model.PayoutLedgers.data.items.Any(x => x.entryType == 9))
                                 {
                                     @foreach (var item in Model.PayoutLedgers.data.items.Where(x => x.entryType == 9))
                                     {

@@ -9,12 +9,16 @@ namespace PaparaIntegration.Services
 {
     public class HttpRequestService : IHttpRequestService
     {
-        private const string ApiKey = "KeMEAJyuUmzRQEdeuxDyz4CRawY3GSJrKvhGzlP+RoSJgSCqOFRsTATW0+t2IhrWArxW0PqAkxDf******";
+        private string ApiKey;
+
+        private readonly IRedisService _redisService;
         private readonly HttpClient _httpClient;
 
-        public HttpRequestService(HttpClient httpClient)
+        public HttpRequestService(HttpClient httpClient, IRedisService redisService)
         {
             _httpClient = httpClient;
+            _redisService = redisService;
+            ApiKey = _redisService.GetValue<string>("TestApiKey");
         }
 
         public async Task<HttpRequestMessage> CreatePostRequestAsnyc(string uri, string jsonPayload)

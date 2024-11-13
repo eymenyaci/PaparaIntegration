@@ -30,36 +30,35 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        // Ledger payoutLedger = new Ledger()
-        // {
-        //     startDate = DateTime.Today.AddMonths(-6), // Bugünden 6 ay önce
-        //     endDate = DateTime.Today.AddMonths(6),    // Bugünden 6 ay sonra
-        //     page = 1,
-        //     pageSize = 10,
-        //     entryType = 9
-        // };
-        // var responsePayout = await _accountService.GetLedgers(payoutLedger);
+        Ledger payoutLedger = new Ledger()
+        {
+            startDate = DateTime.Today.AddMonths(-6), // Bugünden 6 ay önce
+            endDate = DateTime.Today.AddMonths(6),    // Bugünden 6 ay sonra
+            page = 1,
+            pageSize = 10,
+            entryType = 9
+        };
+        var responsePayout = await _accountService.GetLedgers(payoutLedger);
 
-        // Ledger paymentLedger = new Ledger()
-        // {
-        //     startDate = DateTime.Today.AddMonths(-6), // Bugünden 6 ay önce
-        //     endDate = DateTime.Today.AddMonths(6),    // Bugünden 6 ay sonra
-        //     page = 1,
-        //     pageSize = 10,
-        //     entryType = 8
-        // };
-        // var responsePayment = await _accountService.GetLedgers(paymentLedger);
+        Ledger paymentLedger = new Ledger()
+        {
+            startDate = DateTime.Today.AddMonths(-6), // Bugünden 6 ay önce
+            endDate = DateTime.Today.AddMonths(6),    // Bugünden 6 ay sonra
+            page = 1,
+            pageSize = 10,
+            entryType = 8
+        };
+        var responsePayment = await _accountService.GetLedgers(paymentLedger);
 
-        // LedgerViewModel response = new LedgerViewModel()
-        // {
-        //     PayoutLedgers = responsePayout,
-        //     PaymentLedgers = responsePayment
-        // };
+        LedgerViewModel response = new LedgerViewModel()
+        {
+            PayoutLedgers = responsePayout,
+            PaymentLedgers = responsePayment
+        };
 
-        await _corporateCardService.GetCardDetail();
+        // await _corporateCardService.GetCardDetail();
     
-
-        return View();
+        return View(response);
     }
 
     public IActionResult MassPayment()
