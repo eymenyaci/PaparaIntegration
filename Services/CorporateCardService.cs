@@ -40,17 +40,18 @@ namespace PaparaIntegration.Services
                     worksheet.Cells[1, 5].Value = "Cvv";
 
                     int row = 2; 
-                    int count =0
+                    int count =0;
                     foreach (string line in lines)
                     {
                         count++;
-                        var response = await _requestService.SendGetRequestAsync<ApiResponse>("https://merchant-api.papara.com/corporatepaparacards/" + line);
+                        var response = await _requestService.SendGetRequestAsync<ApiResponse>("https://merchant-api.test.papara.com/corporatepaparacards/" + line);
+                        
 
                         if (response?.data?.virtualCardInfo != null)
                         {
                             string notReplaceCardNumber = response.data.virtualCardInfo.cardNumber;
                             string cardNumber = notReplaceCardNumber.Replace(" ", "");
-                            Console.WriteLine(count + ". " + cardNumber +" numaralı kart excele eklendi.");
+                            Console.WriteLine(count + ". " + cardNumber +" numaralı kart excele eklendi." + " CardId: " + line);
                             worksheet.Cells[row, 1].Value = response.data.cardId;
                             worksheet.Cells[row, 2].Value = cardNumber;
                             worksheet.Cells[row, 3].Value = response.data.virtualCardInfo.expiryYear;
